@@ -1,10 +1,12 @@
 import streamlit as st
 
 from streamlit_db import Database
+from ui_helpers import render_sidebar_footer
 
 st.set_page_config(page_title="BrickView | Real Estate Analytics", page_icon="🏠", layout="wide")
 
 db = Database()
+render_sidebar_footer()
 
 
 def format_currency(value):
@@ -17,12 +19,13 @@ def format_currency(value):
     return f"${value:,.2f}"
 
 
-st.title("BrickView: Real Estate Analytics Platform")
+st.title("🏠 BrickView: Real Estate Analytics Platform")
 st.markdown(
     "A **Real Estate Listings Dashboard** for analyzing property listings, agent performance, "
     "and sales patterns — with pricing and time-on-market insights, filtering by location, "
     "property type, price, and agent, and interactive maps and charts."
 )
+st.link_button("View source on GitHub", "https://github.com/mukundnaramesh2605/guvi-python-sql-pandas-project-1", icon="🔗")
 
 st.divider()
 

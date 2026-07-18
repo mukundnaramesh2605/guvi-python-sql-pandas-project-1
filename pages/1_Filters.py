@@ -1,10 +1,12 @@
 import pandas as pd
 import streamlit as st
 from streamlit_db import Database
+from ui_helpers import render_sidebar_footer
 
 st.set_page_config(page_title="Filters | BrickView", page_icon="🔍", layout="wide")
 
 db = Database()
+render_sidebar_footer()
 
 st.title("🔍 Filters")
 st.caption("Filter listings by city, property type, price, agent, and date to explore the underlying data.")

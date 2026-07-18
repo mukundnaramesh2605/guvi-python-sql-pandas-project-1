@@ -1,11 +1,13 @@
 import streamlit as st
 
 from streamlit_db import Database
+from ui_helpers import render_sidebar_footer
 from queries import SQL_QUERIES
 
 st.set_page_config(page_title="SQL Insights | BrickView", page_icon="📊", layout="wide")
 
 db = Database()
+render_sidebar_footer()
 
 st.title("📊 SQL Insights")
 st.caption("30 curated SQL queries covering pricing, sales performance, agents, and buyer financing. "

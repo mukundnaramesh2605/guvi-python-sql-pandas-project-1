@@ -3,9 +3,11 @@ import math
 import pandas as pd
 import streamlit as st
 from streamlit_db import Database
+from ui_helpers import render_sidebar_footer
 st.set_page_config(page_title="CRUD Operations | BrickView", layout="wide")
 
 db = Database()
+render_sidebar_footer()
 
 st.title("CRUD Operations")
 st.caption("Create, read, update, and delete records across every table in the schema.")
