@@ -22,3 +22,6 @@ rad.json
 TestResults.xml
 
 dummy.ipynb
+datasets/.DS_Store
+.gitignore
+.DS_Store
