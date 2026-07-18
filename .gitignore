@@ -25,3 +25,7 @@ dummy.ipynb
 datasets/.DS_Store
 .gitignore
 .DS_Store
+project copy.db
+.claude
+__pycache__
+project_guidlines
