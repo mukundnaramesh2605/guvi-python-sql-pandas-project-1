@@ -2,6 +2,8 @@
 
 BrickView is a multi-page Streamlit application for exploring a real estate portfolio: property listings, sales, agents, buyers, and property attributes. It combines interactive filtering, fixed portfolio-level charts, a library of curated SQL queries, and full CRUD access to the underlying SQLite database — all backed by a single `project.db` file.
 
+**Live app:** [guvi-python-sql-pandas-project-1-ezjufepeeefanufx4sfzjm.streamlit.app](https://guvi-python-sql-pandas-project-1-ezjufepeeefanufx4sfzjm.streamlit.app/)
+
 ## Contents
 
 - [Features](#features)
