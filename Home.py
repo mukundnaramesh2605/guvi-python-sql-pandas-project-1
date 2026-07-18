@@ -6,6 +6,17 @@ st.set_page_config(page_title="BrickView | Real Estate Analytics", page_icon="ðŸ
 
 db = Database()
 
+
+def format_currency(value):
+    if value >= 1_000_000_000:
+        return f"${value / 1_000_000_000:,.2f}B"
+    if value >= 1_000_000:
+        return f"${value / 1_000_000:,.2f}M"
+    if value >= 1_000:
+        return f"${value / 1_000:,.1f}K"
+    return f"${value:,.2f}"
+
+
 st.title("BrickView: Real Estate Analytics Platform")
 st.markdown(
     "A **Real Estate Listings Dashboard** for analyzing property listings, agent performance, "
@@ -29,7 +40,7 @@ col1.metric("Listings", f"{num_listings:,}")
 col2.metric("Cities", f"{num_cities:,}")
 col3.metric("Agents", f"{num_agents:,}")
 col4.metric("Sales Closed", f"{sales_summary['n']:,}")
-col5.metric("Total Revenue", f"${sales_summary['revenue']:,.0f}")
+col5.metric("Total Revenue", format_currency(sales_summary["revenue"]), help=f"${sales_summary['revenue']:,.2f}")
 col6.metric("Avg Days on Market", f"{sales_summary['avg_dom']:,.1f}")
 
 st.divider()
