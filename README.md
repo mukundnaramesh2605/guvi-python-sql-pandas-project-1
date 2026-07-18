@@ -33,7 +33,7 @@ Create, read, update, and delete records in every table (Agents, Listings, Sales
 
 ## Tech Stack
 
-- [Streamlit](https://streamlit.io/) 1.39 — multi-page app framework and UI
+- [Streamlit](https://streamlit.io/) 1.59 — multi-page app framework and UI
 - [pandas](https://pandas.pydata.org/) — data wrangling and SQL result handling
 - [Matplotlib](https://matplotlib.org/) — charts on the Visualizations page
 - SQLite (via `sqlite3`) — embedded database, no external server required
