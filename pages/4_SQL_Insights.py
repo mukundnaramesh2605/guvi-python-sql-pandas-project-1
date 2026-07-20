@@ -1,12 +1,12 @@
 import streamlit as st
 
-from db import Database
+from db import get_db
 from ui_helpers import render_sidebar_footer
 from queries import SQL_QUERIES
 
 st.set_page_config(page_title="SQL Insights | BrickView", page_icon="📊", layout="wide")
 
-db = Database()
+db = get_db()
 render_sidebar_footer()
 
 st.title("📊 SQL Insights")

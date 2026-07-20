@@ -1,5 +1,6 @@
 import pandas as pd
 import sqlite3
+import streamlit as st
 pd.set_option('display.float_format', lambda x: f'{x:,.2f}')
 class Database:
     def __init__(self, db_path="project.db"):
@@ -7,12 +8,14 @@ class Database:
         self.cursor = self.conn.cursor()
         self.conn.execute("PRAGMA foreign_keys = ON;")
 
-    def close(self):
-        self.conn.close()
-    
     def run_query(self, query):
-        return pd.read_sql(query, self.conn)      
+        return pd.read_sql(query, self.conn)
 
     def close(self):
         self.conn.close()
+
+
+@st.cache_resource # to reuse connection throughout the session.
+def get_db(db_path="project.db"):
+    return Database(db_path)
         

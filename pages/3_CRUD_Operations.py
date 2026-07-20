@@ -2,11 +2,11 @@ import math
 
 import pandas as pd
 import streamlit as st
-from db import Database
+from db import get_db
 from ui_helpers import render_sidebar_footer
 st.set_page_config(page_title="CRUD Operations | BrickView", layout="wide")
 
-db = Database()
+db = get_db()
 render_sidebar_footer()
 
 st.title("CRUD Operations")
