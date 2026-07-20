@@ -80,6 +80,7 @@ def add_agent():
             )
             db.conn.commit()
             st.success(f"Agent {agentid} added.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add agent: {e}")
@@ -115,6 +116,7 @@ def update_agent():
             )
             db.conn.commit()
             st.success(f"Agent {selected_id} updated.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update agent: {e}")
@@ -174,6 +176,7 @@ def add_listing():
             )
             db.conn.commit()
             st.success(f"Listing {listingid} added.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add listing: {e}")
@@ -210,6 +213,7 @@ def update_listing():
             )
             db.conn.commit()
             st.success(f"Listing {selected_id} updated.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update listing: {e}")
@@ -259,6 +263,7 @@ def add_sale():
             )
             db.conn.commit()
             st.success(f"Sale for listing {listingid} added.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add sale: {e}")
@@ -287,6 +292,7 @@ def update_sale():
             )
             db.conn.commit()
             st.success(f"Sale for listing {selected_id} updated.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update sale: {e}")
@@ -344,6 +350,7 @@ def add_buyer():
             )
             db.conn.commit()
             st.success(f"Buyer {buyerid} added.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add buyer: {e}")
@@ -380,6 +387,7 @@ def update_buyer():
             )
             db.conn.commit()
             st.success(f"Buyer {selected_id} updated.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update buyer: {e}")
@@ -407,9 +415,7 @@ def delete_buyer():
             st.error(f"Could not delete buyer: {e}")
 
 
-# =====================================================================
 # PROPERTY ATTRIBUTES
-# =====================================================================
 
 def view_property_attributes():
     df = db.run_query("SELECT * FROM property_attributes ORDER BY attributeid")
@@ -449,6 +455,7 @@ def add_property_attribute():
             )
             db.conn.commit()
             st.success(f"Property attribute {attributeid} added.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add property attribute: {e}")
@@ -493,6 +500,7 @@ def update_property_attribute():
             )
             db.conn.commit()
             st.success(f"Property attribute {selected_id} updated.")
+            st.rerun()
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update property attribute: {e}")
@@ -521,10 +529,8 @@ def delete_property_attribute():
             db.conn.rollback()
             st.error(f"Could not delete property attribute: {e}")
 
-
-# =====================================================================
 # Page layout: pick the right set of functions for the chosen table
-# =====================================================================
+
 
 tab_view, tab_add, tab_update, tab_delete = st.tabs(["View", "Add", "Update", "Delete"])
 
