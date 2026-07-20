@@ -2,7 +2,7 @@ import math
 
 import pandas as pd
 import streamlit as st
-from streamlit_db import Database
+from db import Database
 from ui_helpers import render_sidebar_footer
 st.set_page_config(page_title="CRUD Operations | BrickView", layout="wide")
 
@@ -575,4 +575,3 @@ with tab_delete:
         delete_buyer()
     elif table == "Property Attributes":
         delete_property_attribute()
-        

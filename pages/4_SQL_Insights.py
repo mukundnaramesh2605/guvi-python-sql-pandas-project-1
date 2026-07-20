@@ -1,6 +1,6 @@
 import streamlit as st
 
-from streamlit_db import Database
+from db import Database
 from ui_helpers import render_sidebar_footer
 from queries import SQL_QUERIES
 
