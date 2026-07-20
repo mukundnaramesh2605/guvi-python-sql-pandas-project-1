@@ -14,10 +14,11 @@ SQL_QUERIES = {
         {
             "title": "2. What is the average price per square foot by property type?",
             "sql": """
-                SELECT propertytype, ROUND(AVG(price / sqft), 2) AS avg_price_per_sqft
-                FROM listings
-                GROUP BY propertytype
-                ORDER BY avg_price_per_sqft DESC;
+                SELECT p.furnishingstatus, ROUND(AVG(l.price), 2) AS average_price
+                FROM listings l
+                JOIN property_attributes p ON l.listingid = p.listingid
+                GROUP BY p.furnishingstatus
+                ORDER BY average_price DESC;
             """,
         },
         {
