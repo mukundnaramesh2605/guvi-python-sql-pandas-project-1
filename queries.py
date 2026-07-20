@@ -177,130 +177,150 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "Sale-to-list price ratio by city",
+            "title": "13.What percentage of properties are sold above listing price?",
             "sql": """
-                SELECT l.city, ROUND(AVG(s.saleprice * 1.0 / l.price), 3) AS sale_to_list_ratio
-                FROM sales s
-                JOIN listings l ON l.listingid = s.listingid
+                SELECT ROUND(
+                SUM(CASE WHEN s.saleprice > l.price THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+                2
+            ) AS percentage_sold_above_listing
+            FROM listings l
+            JOIN sales s ON l.listingid = s.listingid;
+            """,
+        },
+        {
+            "title": "14.What is the sale-to-list price ratio by city?",
+            "sql": """
+                SELECT l.city, ROUND(AVG(s.saleprice / l.price), 4) AS sale_to_list_ratio
+                FROM listings l
+                JOIN sales s ON s.listingid = l.listingid
                 GROUP BY l.city
                 ORDER BY sale_to_list_ratio DESC;
             """,
         },
         {
-            "title": "Which listings took more than 90 days to sell?",
+            "title": "15.Which listings took more than 90 days to sell?",
             "sql": """
-                SELECT l.listingid, l.city, l.propertytype, l.price, s.saleprice, s.daysonmarket
-                FROM sales s
-                JOIN listings l ON l.listingid = s.listingid
-                WHERE s.daysonmarket > 90
-                ORDER BY s.daysonmarket DESC;
+                SELECT listingid, daysonmarket
+                FROM sales
+                WHERE daysonmarket > 90
+                ORDER BY daysonmarket DESC;
             """,
         },
         {
-            "title": "How does metro distance affect time on market?",
+            "title": "16.How does metro distance affect time on market?",
             "sql": """
-                SELECT CASE
-                           WHEN pa.metrodistancekm <= 1 THEN '0-1 km'
-                           WHEN pa.metrodistancekm <= 3 THEN '1-3 km'
-                           WHEN pa.metrodistancekm <= 5 THEN '3-5 km'
-                           ELSE '5+ km'
-                       END AS metro_distance_bucket,
-                       ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM sales s
-                JOIN property_attributes pa ON pa.listingid = s.listingid
-                GROUP BY metro_distance_bucket
-                ORDER BY MIN(pa.metrodistancekm);
+                SELECT
+                    CASE
+                        WHEN p.metrodistancekm <= 1 THEN 'Within 1 km'
+                        WHEN p.metrodistancekm <= 3 THEN '1 - 3 km'
+                        WHEN p.metrodistancekm <= 5 THEN '3 - 5 km'
+                        ELSE 'More than 5 km'
+                    END AS metro_distance,
+                    AVG(s.daysonmarket) AS average_days_on_market
+                FROM property_attributes p
+                JOIN sales s ON s.listingid = p.listingid
+                GROUP BY metro_distance
+                ORDER BY average_days_on_market DESC;
             """,
         },
         {
-            "title": "What is the monthly sales trend?",
+            "title": "17.What is the monthly sales trend?",
             "sql": """
-                SELECT strftime('%Y-%m', datesold) AS month,
-                       COUNT(*) AS sales_count,
-                       ROUND(SUM(saleprice), 2) AS total_revenue
+                SELECT strftime('%Y-%m', datesold) AS month, COUNT(*) AS total_sales_per_month
                 FROM sales
                 GROUP BY month
-                ORDER BY month;
+                ORDER BY month ASC;
             """,
         },
         {
-            "title": "Which properties are currently unsold?",
+            "title": "18.Which properties are currently unsold?",
             "sql": """
-                SELECT l.listingid, l.city, l.propertytype, l.price, l.datelisted
+                SELECT city, COUNT(*) AS total_unsold_properties
                 FROM listings l
-                LEFT JOIN sales s ON s.listingid = l.listingid
-                WHERE s.listingid IS NULL
-                ORDER BY l.datelisted;
+                WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.listingid = l.listingid)
+                GROUP BY city
+                ORDER BY total_unsold_properties DESC;
             """,
         },
     ],
     "Agent Performance": [
         {
-            "title": "Which agents have closed the most sales?",
+            "title": "19.Which agents have closed the most sales?",
             "sql": """
-                SELECT a.agentid, a.name, COUNT(s.listingid) AS sales_closed
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
+                SELECT a.agentid, a.name, COUNT(s.listingid) AS closed_sales
+                FROM listings l
                 JOIN sales s ON s.listingid = l.listingid
+                JOIN agents a ON a.agentid = l.agentid
                 GROUP BY a.agentid, a.name
-                ORDER BY sales_closed DESC
-                LIMIT 10;
+                ORDER BY closed_sales DESC;
             """,
         },
         {
-            "title": "Who are the top agents by total sales revenue?",
+            "title": "20.Who are the top agents by total sales revenue?",
             "sql": """
-                SELECT a.agentid, a.name, ROUND(SUM(s.saleprice), 2) AS total_revenue
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
+                SELECT
+                a.agentid,
+                a.name,
+                COUNT(s.listingid) AS no_of_listings_sold,
+                SUM(s.saleprice) AS total_sales_revenue,
+                ROUND(AVG(s.saleprice), 2) AS average_sales_revenue
+            FROM listings l
+            JOIN sales s ON s.listingid = l.listingid
+            JOIN agents a ON a.agentid = l.agentid
+            GROUP BY a.agentid, a.name
+            ORDER BY total_sales_revenue DESC;
+            """,
+        },
+        {
+            "title": "21.Which agents close deals fastest?",
+            "sql": """
+                SELECT a.agentid, a.name, COUNT(*) AS total_deals_closed, ROUND(AVG(s.daysonmarket), 0) AS days_taken_to_close_deal
+                    FROM listings l
+                    JOIN sales s ON s.listingid = l.listingid
+                    JOIN agents a ON a.agentid = l.agentid
+                    GROUP BY a.agentid, a.name
+                    ORDER BY days_taken_to_close_deal ASC, total_deals_closed DESC
+                    LIMIT 10;
+            """,
+        },
+        {
+            "title": "22.Does experience correlate with deals closed?",
+            "sql": """
+                SELECT
+                    CASE
+                        WHEN experienceyears <= 5  THEN '0-5 yrs'
+                        WHEN experienceyears <= 10 THEN '6-10 yrs'
+                        WHEN experienceyears <= 15 THEN '11-15 yrs'
+                        WHEN experienceyears <= 20 THEN '16-20 yrs'
+                        ELSE '21+ yrs'
+                    END AS experience_band,
+                    COUNT(*) AS num_agents,
+                    ROUND(AVG(dealsclosed),0) AS avg_deals
+                    FROM agents
+                    GROUP BY experience_band
+                    ORDER BY MIN(experienceyears);
+            """,
+        },
+        {
+            "title": "23.Do agents with higher ratings close deals faster?",
+            "sql": """
+                SELECT a.agentid, a.name, rating, ROUND(AVG(s.daysonmarket), 0) AS days_taken_to_close_deal
+                FROM listings l
                 JOIN sales s ON s.listingid = l.listingid
+                JOIN agents a ON a.agentid = l.agentid
                 GROUP BY a.agentid, a.name
-                ORDER BY total_revenue DESC
-                LIMIT 10;
+                ORDER BY rating ASC, days_taken_to_close_deal ASC;
             """,
         },
         {
-            "title": "Which agents close deals fastest?",
+            "title": "24.What is the average commission earned by each agent?",
             "sql": """
-                SELECT a.agentid, a.name, ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
+                SELECT a.agentid, a.name, ROUND(AVG(s.saleprice * (a.commissionrate / 100)), 2) AS avg_commission_per_sale
+                FROM listings l
                 JOIN sales s ON s.listingid = l.listingid
+                JOIN agents a ON a.agentid = l.agentid
                 GROUP BY a.agentid, a.name
-                ORDER BY avg_days_on_market ASC
-                LIMIT 10;
-            """,
-        },
-        {
-            "title": "Does experience correlate with deals closed?",
-            "sql": """
-                SELECT experienceyears, ROUND(AVG(dealsclosed), 2) AS avg_deals_closed, COUNT(*) AS agents
-                FROM agents
-                GROUP BY experienceyears
-                ORDER BY experienceyears;
-            """,
-        },
-        {
-            "title": "Do agents with higher ratings close deals faster?",
-            "sql": """
-                SELECT ROUND(a.rating, 1) AS rating, ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
-                JOIN sales s ON s.listingid = l.listingid
-                GROUP BY ROUND(a.rating, 1)
-                ORDER BY rating DESC;
-            """,
-        },
-        {
-            "title": "What is the average commission earned by each agent?",
-            "sql": """
-                SELECT a.agentid, a.name, a.commissionrate,
-                       ROUND(SUM(s.saleprice * a.commissionrate / 100.0), 2) AS total_commission_earned
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
-                JOIN sales s ON s.listingid = l.listingid
-                GROUP BY a.agentid, a.name, a.commissionrate
-                ORDER BY total_commission_earned DESC;
+                ORDER BY avg_commission_per_sale DESC;
             """,
         },
         {
