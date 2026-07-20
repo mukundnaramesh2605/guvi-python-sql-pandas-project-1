@@ -76,7 +76,7 @@ def add_agent():
         commissionrate = st.number_input("Commission Rate (%)", min_value=0.0, step=0.1)
         dealsclosed = st.number_input("Deals Closed", min_value=0, step=1)
         rating = st.number_input("Rating", min_value=0.0, max_value=5.0, step=0.1)
-        experienceyears = st.number_input("Experience (years)", min_value=0.0, step=1)
+        experienceyears = st.number_input("Experience (years)", min_value=0.0, step=1.0)
         avgclosingdays = st.number_input("Avg Closing Days", min_value=0, step=1)
         submitted = st.form_submit_button("Add Agent")
 
