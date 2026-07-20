@@ -44,7 +44,7 @@ col2.metric("Cities", f"{num_cities:,}")
 col3.metric("Agents", f"{num_agents:,}")
 col4.metric("Sales Closed", f"{sales_summary['n']:,}")
 col5.metric("Total Revenue", format_currency(sales_summary["revenue"]), help=f"${sales_summary['revenue']:,.2f}")
-col6.metric("Avg Days on Market", f"{sales_summary['avg_dom']:,.1f}")
+col6.metric("Avg Days on Market", f"{sales_summary['avg_dom']:,.0f}")
 
 st.divider()
 
