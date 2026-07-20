@@ -96,51 +96,64 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "How does year built influence listing price?",
+            "title": "8. How does year built influence listing price?",
             "sql": """
-                SELECT pa.yearbuilt, ROUND(AVG(l.price), 2) AS avg_price, COUNT(*) AS listings
+                SELECT
+                    CASE
+                        WHEN p.yearbuilt BETWEEN 1990 AND 1995 THEN 'Between 1990 and 1995'
+                        WHEN p.yearbuilt BETWEEN 1996 AND 2000 THEN 'Between 1996 and 2000'
+                        WHEN p.yearbuilt BETWEEN 2001 AND 2005 THEN 'Between 2001 and 2005'
+                        WHEN p.yearbuilt BETWEEN 2006 AND 2010 THEN 'Between 2006 and 2010'
+                        WHEN p.yearbuilt BETWEEN 2011 AND 2015 THEN 'Between 2011 and 2015'
+                        WHEN p.yearbuilt BETWEEN 2016 AND 2020 THEN 'Between 2016 and 2020'
+                        WHEN p.yearbuilt BETWEEN 2021 AND 2025 THEN 'Between 2021 and 2025'
+                        ELSE 'Other'
+                    END AS built_between,
+                    COUNT(*) AS total_properties,
+                    ROUND(AVG(l.price), 2) AS average_price
                 FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY pa.yearbuilt
-                ORDER BY pa.yearbuilt;
+                JOIN property_attributes p ON l.listingid = p.listingid
+                GROUP BY built_between
+                ORDER BY average_price DESC;
             """,
         },
         {
-            "title": "Which cities have the highest average property prices?",
+            "title": "9. Which cities have the highest average property prices?",
             "sql": """
-                SELECT city, ROUND(AVG(price), 2) AS avg_price
+                SELECT city, COUNT(*) AS total_listings, ROUND(AVG(price), 2) AS average_price
                 FROM listings
                 GROUP BY city
-                ORDER BY avg_price DESC
+                ORDER BY average_price DESC
                 LIMIT 10;
             """,
         },
         {
-            "title": "How are properties distributed across price buckets?",
+            "title": "10.How are properties distributed across price buckets?",
             "sql": """
-                SELECT CASE
-                           WHEN price < 250000 THEN '< 250K'
-                           WHEN price < 500000 THEN '250K - 500K'
-                           WHEN price < 750000 THEN '500K - 750K'
-                           WHEN price < 1000000 THEN '750K - 1M'
-                           ELSE '1M+'
-                       END AS price_bucket,
-                       COUNT(*) AS listings
-                FROM listings
-                GROUP BY price_bucket
-                ORDER BY MIN(price);
+                SELECT
+                CASE
+                    WHEN price < 1000000 THEN 'Below 1M'
+                    WHEN price < 2000000 THEN '1M - 2M'
+                    WHEN price < 3000000 THEN '2M - 3M'
+                    WHEN price < 4000000 THEN '3M - 4M'
+                    ELSE 'Above 4M'
+                END AS price_bucket,
+                COUNT(*) AS total_properties
+            FROM listings
+            GROUP BY price_bucket
+            ORDER BY MIN(price);
             """,
         },
     ],
     "Sales & Market Performance": [
         {
-            "title": "Average days on market by city",
+            "title": "11.What is the average days on market by city?",
             "sql": """
-                SELECT l.city, ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM sales s
-                JOIN listings l ON l.listingid = s.listingid
+                SELECT l.city, ROUND(AVG(s.daysonmarket), 0) AS average_days_on_market
+                FROM listings l
+                JOIN sales s ON s.listingid = l.listingid
                 GROUP BY l.city
-                ORDER BY avg_days_on_market;
+                ORDER BY average_days_on_market DESC;
             """,
         },
         {
@@ -154,12 +167,13 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "What percentage of properties sold above listing price?",
+            "title": "12.Which property types sell the fastest?",
             "sql": """
-                SELECT ROUND(100.0 * SUM(CASE WHEN s.saleprice > l.price THEN 1 ELSE 0 END) / COUNT(*), 2)
-                           AS pct_sold_above_list
-                FROM sales s
-                JOIN listings l ON l.listingid = s.listingid;
+                SELECT l.propertytype, ROUND(AVG(s.daysonmarket), 0) AS average_days_on_market
+                FROM listings l
+                JOIN sales s ON s.listingid = l.listingid
+                GROUP BY l.propertytype
+                ORDER BY average_days_on_market ASC;
             """,
         },
         {
