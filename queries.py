@@ -157,16 +157,6 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "Which property types sell the fastest?",
-            "sql": """
-                SELECT l.propertytype, ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM sales s
-                JOIN listings l ON l.listingid = s.listingid
-                GROUP BY l.propertytype
-                ORDER BY avg_days_on_market;
-            """,
-        },
-        {
             "title": "12.Which property types sell the fastest?",
             "sql": """
                 SELECT l.propertytype, ROUND(AVG(s.daysonmarket), 0) AS average_days_on_market
