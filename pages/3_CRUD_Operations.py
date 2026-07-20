@@ -575,3 +575,4 @@ with tab_delete:
         delete_buyer()
     elif table == "Property Attributes":
         delete_property_attribute()
+        
