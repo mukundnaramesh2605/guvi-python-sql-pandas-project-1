@@ -17,8 +17,6 @@ if "_flash_message" in st.session_state:
 
 
 def flash_success(message: str):
-    # st.rerun() interrupts the script immediately, so a st.success() call right
-    # before it never gets rendered. Stash the message and show it after rerun instead.
     st.session_state["_flash_message"] = message
     st.rerun()
 
@@ -60,6 +58,15 @@ def paginate_dataframe(df: pd.DataFrame, key_prefix: str, label: str):
     st.caption(f"Showing {start + 1 if total else 0}-{min(end, total)} of {total} {label}")
 
 
+def next_prefixed_id(table: str, id_column: str, prefix: str, width: int):
+    query = (
+        f"SELECT COALESCE(MAX(CAST(SUBSTR({id_column}, {len(prefix) + 1}) AS INTEGER)), 0) + 1 "
+        f"AS next_num FROM {table}"
+    )
+    next_num = db.run_query(query).iloc[0]["next_num"]
+    return f"{prefix}{int(next_num):0{width}d}"
+
+
 # AGENTS
 
 def view_agents():
@@ -68,8 +75,10 @@ def view_agents():
 
 
 def add_agent():
+    next_agentid = next_prefixed_id("agents", "agentid", "A", 4)
+
     with st.form("add_agent_form"):
-        agentid = st.text_input("Agent ID (e.g. A0051)")
+        agentid = st.text_input("Agent ID (e.g. A0051)", value=next_agentid)
         name = st.text_input("Name")
         phone = st.text_input("Phone")
         email = st.text_input("Email")
@@ -166,9 +175,10 @@ def view_listings():
 
 def add_listing():
     agent_ids = db.run_query("SELECT agentid FROM agents ORDER BY agentid")["agentid"].tolist()
+    next_listingid = next_prefixed_id("listings", "listingid", "L", 5)
 
     with st.form("add_listing_form"):
-        listingid = st.text_input("Listing ID (e.g. L21201)")
+        listingid = st.text_input("Listing ID (e.g. L21201)", value=next_listingid)
         city = st.text_input("City")
         propertytype = st.selectbox("Property Type", ["Apartment", "Condo", "House", "Townhouse"])
         price = st.number_input("Price", min_value=0.0, step=1000.0)
