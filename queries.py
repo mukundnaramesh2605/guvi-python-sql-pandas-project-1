@@ -225,11 +225,9 @@ SQL_QUERIES = {
         {
             "title": "18.Which properties are currently unsold?",
             "sql": """
-                SELECT city, COUNT(*) AS total_unsold_properties
-                FROM listings l
-                WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.listingid = l.listingid)
-                GROUP BY city
-                ORDER BY total_unsold_properties DESC;
+                SELECT *
+                    FROM listings l
+                    WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE s.listingid = l.listingid);
             """,
         },
     ],
