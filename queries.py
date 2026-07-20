@@ -298,7 +298,7 @@ SQL_QUERIES = {
                 FROM listings l
                 JOIN sales s ON s.listingid = l.listingid
                 JOIN agents a ON a.agentid = l.agentid
-                GROUP BY a.agentid, a.name
+                GROUP BY a.agentid, a.name , rating
                 ORDER BY rating ASC, days_taken_to_close_deal ASC;
             """,
         },
