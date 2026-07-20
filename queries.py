@@ -50,39 +50,49 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "Are rented properties priced differently from non-rented ones?",
+            "title": "5. Are rented properties priced differently from non-rented ones?",
             "sql": """
-                SELECT CASE WHEN pa.isrented = 1 THEN 'Rented' ELSE 'Not Rented' END AS rental_status,
-                       ROUND(AVG(l.price), 2) AS avg_price,
-                       COUNT(*) AS listings
+                SELECT
+                    CASE
+                        WHEN p.isrented = 1 THEN 'Rented'
+                        ELSE 'Non Rented'
+                    END AS rental_status,
+                    COUNT(*) AS total_properties,
+                    ROUND(AVG(l.price), 2) AS average_price
                 FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY rental_status;
+                JOIN property_attributes p ON l.listingid = p.listingid
+                GROUP BY rental_status
+                ORDER BY average_price DESC;
             """,
         },
         {
-            "title": "How do bedrooms and bathrooms affect pricing?",
+            "title": "6. How do bedrooms and bathrooms affect pricing?",
             "sql": """
-                SELECT pa.bedrooms, pa.bathrooms,
-                       ROUND(AVG(l.price), 2) AS avg_price,
-                       COUNT(*) AS listings
+                SELECT p.bedrooms, p.bathrooms, COUNT(*) AS total_properties, ROUND(AVG(l.price), 2) AS average_price
                 FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY pa.bedrooms, pa.bathrooms
-                ORDER BY pa.bedrooms, pa.bathrooms;
+                JOIN property_attributes p ON l.listingid = p.listingid
+                GROUP BY p.bedrooms, p.bathrooms
+                ORDER BY p.bedrooms, p.bathrooms;
             """,
         },
         {
-            "title": "Do properties with parking and power backup sell at higher prices?",
+            "title": "7. Do properties with parking and power backup sell at higher prices?",
             "sql": """
-                SELECT CASE WHEN pa.parkingavailable = 1 THEN 'Yes' ELSE 'No' END AS parking_available,
-                       CASE WHEN pa.powerbackup = 1 THEN 'Yes' ELSE 'No' END AS power_backup,
-                       ROUND(AVG(l.price), 2) AS avg_price,
-                       COUNT(*) AS listings
+                SELECT
+                    CASE
+                        WHEN p.parkingavailable = 1 THEN 'Parking'
+                        ELSE 'No Parking'
+                    END AS parking,
+                    CASE
+                        WHEN p.powerbackup = 1 THEN 'Power Backup'
+                        ELSE 'No Power Backup'
+                    END AS power_backup,
+                    COUNT(*) AS total_properties,
+                    ROUND(AVG(l.price), 2) AS average_price
                 FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY parking_available, power_backup
-                ORDER BY avg_price DESC;
+                JOIN property_attributes p ON l.listingid = p.listingid
+                GROUP BY p.parkingavailable, p.powerbackup
+                ORDER BY average_price DESC;
             """,
         },
         {
