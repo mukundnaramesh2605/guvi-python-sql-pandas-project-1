@@ -51,7 +51,6 @@ def paginate_dataframe(df: pd.DataFrame, key_prefix: str, label: str):
 
 # AGENTS
 
-
 def view_agents():
     df = db.run_query("SELECT * FROM agents ORDER BY agentid")
     paginate_dataframe(df, "agents", "agents")
