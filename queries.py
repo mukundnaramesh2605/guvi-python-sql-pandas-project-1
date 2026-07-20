@@ -14,6 +14,16 @@ SQL_QUERIES = {
         {
             "title": "2. What is the average price per square foot by property type?",
             "sql": """
+                SELECT propertytype,
+                       ROUND(AVG(price * 1.0 / sqft), 2) AS avg_price_per_sqft
+                FROM listings
+                GROUP BY propertytype
+                ORDER BY avg_price_per_sqft DESC;
+            """,
+        },
+        {
+            "title": "3. How does furnishing status impact property prices?",
+            "sql": """
                 SELECT p.furnishingstatus, ROUND(AVG(l.price), 2) AS average_price
                 FROM listings l
                 JOIN property_attributes p ON l.listingid = p.listingid
@@ -22,30 +32,21 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "3. How does furnishing status impact property prices?",
+            "title": "4. Do properties closer to metro stations command higher prices?",
             "sql": """
-                SELECT pa.furnishingstatus, ROUND(AVG(l.price), 2) AS avg_price, COUNT(*) AS listings
-                FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY pa.furnishingstatus
-                ORDER BY avg_price DESC;
-            """,
-        },
-        {
-            "title": "Do properties closer to metro stations command higher prices?",
-            "sql": """
-                SELECT CASE
-                           WHEN pa.metrodistancekm <= 1 THEN '0-1 km'
-                           WHEN pa.metrodistancekm <= 3 THEN '1-3 km'
-                           WHEN pa.metrodistancekm <= 5 THEN '3-5 km'
-                           ELSE '5+ km'
-                       END AS metro_distance_bucket,
-                       ROUND(AVG(l.price), 2) AS avg_price,
-                       COUNT(*) AS listings
-                FROM listings l
-                JOIN property_attributes pa ON pa.listingid = l.listingid
-                GROUP BY metro_distance_bucket
-                ORDER BY MIN(pa.metrodistancekm);
+                SELECT
+                CASE
+                    WHEN p.metrodistancekm <= 1 THEN 'Within 1 km'
+                    WHEN p.metrodistancekm <= 3 THEN '1 - 3 km'
+                    WHEN p.metrodistancekm <= 5 THEN '3 - 5 km'
+                    ELSE 'More than 5 km'
+                END AS metro_distance,
+                COUNT(*) AS total_properties,
+                ROUND(AVG(l.price), 2) AS average_price
+            FROM listings l
+            JOIN property_attributes p ON l.listingid = p.listingid
+            GROUP BY metro_distance
+            ORDER BY average_price DESC;
             """,
         },
         {
