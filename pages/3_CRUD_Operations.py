@@ -87,13 +87,16 @@ def add_agent():
 
 
 def update_agent():
-    agent_ids = db.run_query("SELECT agentid FROM agents ORDER BY agentid")["agentid"].tolist()
-    if not agent_ids:
-        st.info("No agents yet.")
+    selected_id = st.text_input("Agent ID to update (e.g. A0051)", key="update_agent_select").strip()
+    if not selected_id:
+        st.info("Enter an Agent ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Agent ID to update", agent_ids)
-    row = pd.read_sql("SELECT * FROM agents WHERE agentid = ?", db.conn, params=(selected_id,)).iloc[0]
+    row_df = pd.read_sql("SELECT * FROM agents WHERE agentid = ?", db.conn, params=(selected_id,))
+    if row_df.empty:
+        st.warning(f"No agent found with ID {selected_id}.")
+        return
+    row = row_df.iloc[0]
 
     with st.form("update_agent_form"):
         name = st.text_input("Name", value=row["name"])
@@ -123,13 +126,15 @@ def update_agent():
 
 
 def delete_agent():
-    agent_ids = db.run_query("SELECT agentid FROM agents ORDER BY agentid")["agentid"].tolist()
-    if not agent_ids:
-        st.info("No agents yet.")
+    selected_id = st.text_input("Agent ID to delete (e.g. A0051)", key="delete_agent_select").strip()
+    if not selected_id:
+        st.info("Enter an Agent ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Agent ID to delete", agent_ids, key="delete_agent_select")
     row = pd.read_sql("SELECT * FROM agents WHERE agentid = ?", db.conn, params=(selected_id,))
+    if row.empty:
+        st.warning(f"No agent found with ID {selected_id}.")
+        return
     st.dataframe(row, use_container_width=True, hide_index=True)
 
     confirm = st.checkbox(f"Yes, delete agent {selected_id}", key="confirm_delete_agent")
@@ -183,13 +188,16 @@ def add_listing():
 
 
 def update_listing():
-    listing_ids = db.run_query("SELECT listingid FROM listings ORDER BY listingid")["listingid"].tolist()
-    if not listing_ids:
-        st.info("No listings yet.")
+    selected_id = st.text_input("Listing ID to update (e.g. L21201)", key="update_listing_select").strip()
+    if not selected_id:
+        st.info("Enter a Listing ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Listing ID to update", listing_ids)
-    row = pd.read_sql("SELECT * FROM listings WHERE listingid = ?", db.conn, params=(selected_id,)).iloc[0]
+    row_df = pd.read_sql("SELECT * FROM listings WHERE listingid = ?", db.conn, params=(selected_id,))
+    if row_df.empty:
+        st.warning(f"No listing found with ID {selected_id}.")
+        return
+    row = row_df.iloc[0]
     agent_ids = db.run_query("SELECT agentid FROM agents ORDER BY agentid")["agentid"].tolist()
 
     with st.form("update_listing_form"):
@@ -220,13 +228,15 @@ def update_listing():
 
 
 def delete_listing():
-    listing_ids = db.run_query("SELECT listingid FROM listings ORDER BY listingid")["listingid"].tolist()
-    if not listing_ids:
-        st.info("No listings yet.")
+    selected_id = st.text_input("Listing ID to delete (e.g. L21201)", key="delete_listing_select").strip()
+    if not selected_id:
+        st.info("Enter a Listing ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Listing ID to delete", listing_ids, key="delete_listing_select")
     row = pd.read_sql("SELECT * FROM listings WHERE listingid = ?", db.conn, params=(selected_id,))
+    if row.empty:
+        st.warning(f"No listing found with ID {selected_id}.")
+        return
     st.dataframe(row, use_container_width=True, hide_index=True)
 
     confirm = st.checkbox(f"Yes, delete listing {selected_id}", key="confirm_delete_listing")
@@ -270,13 +280,16 @@ def add_sale():
 
 
 def update_sale():
-    listing_ids = db.run_query("SELECT listingid FROM sales ORDER BY listingid")["listingid"].tolist()
-    if not listing_ids:
-        st.info("No sales yet.")
+    selected_id = st.text_input("Listing ID (sale) to update", key="update_sale_select").strip()
+    if not selected_id:
+        st.info("Enter a Listing ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Listing ID to update", listing_ids)
-    row = pd.read_sql("SELECT * FROM sales WHERE listingid = ?", db.conn, params=(selected_id,)).iloc[0]
+    row_df = pd.read_sql("SELECT * FROM sales WHERE listingid = ?", db.conn, params=(selected_id,))
+    if row_df.empty:
+        st.warning(f"No sale found for listing {selected_id}.")
+        return
+    row = row_df.iloc[0]
 
     with st.form("update_sale_form"):
         saleprice = st.number_input("Sale Price", value=float(row["saleprice"]), min_value=0.0, step=1000.0)
@@ -299,13 +312,15 @@ def update_sale():
 
 
 def delete_sale():
-    listing_ids = db.run_query("SELECT listingid FROM sales ORDER BY listingid")["listingid"].tolist()
-    if not listing_ids:
-        st.info("No sales yet.")
+    selected_id = st.text_input("Listing ID (sale) to delete", key="delete_sale_select").strip()
+    if not selected_id:
+        st.info("Enter a Listing ID to look it up.")
         return
 
-    selected_id = st.selectbox("Select Listing ID to delete", listing_ids, key="delete_sale_select")
     row = pd.read_sql("SELECT * FROM sales WHERE listingid = ?", db.conn, params=(selected_id,))
+    if row.empty:
+        st.warning(f"No sale found for listing {selected_id}.")
+        return
     st.dataframe(row, use_container_width=True, hide_index=True)
 
     confirm = st.checkbox(f"Yes, delete sale for listing {selected_id}", key="confirm_delete_sale")
@@ -357,13 +372,13 @@ def add_buyer():
 
 
 def update_buyer():
-    buyer_ids = db.run_query("SELECT buyerid FROM buyers ORDER BY buyerid")["buyerid"].tolist()
-    if not buyer_ids:
-        st.info("No buyers yet.")
-        return
+    selected_id = st.number_input("Buyer ID to update", min_value=1, step=1, key="update_buyer_select")
 
-    selected_id = st.selectbox("Select Buyer ID to update", buyer_ids)
-    row = pd.read_sql("SELECT * FROM buyers WHERE buyerid = ?", db.conn, params=(int(selected_id),)).iloc[0]
+    row_df = pd.read_sql("SELECT * FROM buyers WHERE buyerid = ?", db.conn, params=(int(selected_id),))
+    if row_df.empty:
+        st.warning(f"No buyer found with ID {selected_id}.")
+        return
+    row = row_df.iloc[0]
     sale_ids = db.run_query("SELECT listingid FROM sales ORDER BY listingid")["listingid"].tolist()
 
     with st.form("update_buyer_form"):
@@ -394,13 +409,12 @@ def update_buyer():
 
 
 def delete_buyer():
-    buyer_ids = db.run_query("SELECT buyerid FROM buyers ORDER BY buyerid")["buyerid"].tolist()
-    if not buyer_ids:
-        st.info("No buyers yet.")
-        return
+    selected_id = st.number_input("Buyer ID to delete", min_value=1, step=1, key="delete_buyer_select")
 
-    selected_id = st.selectbox("Select Buyer ID to delete", buyer_ids, key="delete_buyer_select")
     row = pd.read_sql("SELECT * FROM buyers WHERE buyerid = ?", db.conn, params=(int(selected_id),))
+    if row.empty:
+        st.warning(f"No buyer found with ID {selected_id}.")
+        return
     st.dataframe(row, use_container_width=True, hide_index=True)
 
     confirm = st.checkbox(f"Yes, delete buyer {selected_id}", key="confirm_delete_buyer")
@@ -462,15 +476,15 @@ def add_property_attribute():
 
 
 def update_property_attribute():
-    ids = db.run_query("SELECT attributeid FROM property_attributes ORDER BY attributeid")["attributeid"].tolist()
-    if not ids:
-        st.info("No records yet.")
-        return
+    selected_id = st.number_input("Attribute ID to update", min_value=1, step=1, key="update_property_attribute_select")
 
-    selected_id = st.selectbox("Select Attribute ID to update", ids)
-    row = pd.read_sql(
+    row_df = pd.read_sql(
         "SELECT * FROM property_attributes WHERE attributeid = ?", db.conn, params=(int(selected_id),)
-    ).iloc[0]
+    )
+    if row_df.empty:
+        st.warning(f"No property attribute found with ID {selected_id}.")
+        return
+    row = row_df.iloc[0]
 
     with st.form("update_property_attribute_form"):
         listingid = st.text_input("Listing ID", value=row["listingid"])
@@ -507,15 +521,14 @@ def update_property_attribute():
 
 
 def delete_property_attribute():
-    ids = db.run_query("SELECT attributeid FROM property_attributes ORDER BY attributeid")["attributeid"].tolist()
-    if not ids:
-        st.info("No records yet.")
-        return
+    selected_id = st.number_input("Attribute ID to delete", min_value=1, step=1, key="delete_property_attribute_select")
 
-    selected_id = st.selectbox("Select Attribute ID to delete", ids, key="delete_property_attribute_select")
     row = pd.read_sql(
         "SELECT * FROM property_attributes WHERE attributeid = ?", db.conn, params=(int(selected_id),)
     )
+    if row.empty:
+        st.warning(f"No property attribute found with ID {selected_id}.")
+        return
     st.dataframe(row, use_container_width=True, hide_index=True)
 
     confirm = st.checkbox(f"Yes, delete property attribute {selected_id}", key="confirm_delete_property_attribute")
