@@ -19,10 +19,10 @@ listings = db.run_query(
     JOIN agents a ON a.agentid = l.agentid
     """
 )
-listings["datelisted"] = pd.to_datetime(listings["datelisted"])
+listings["datelisted"] = pd.to_datetime(listings["datelisted"], format="mixed")
 
 sales = db.run_query("SELECT listingid, saleprice, datesold, daysonmarket FROM sales")
-sales["datesold"] = pd.to_datetime(sales["datesold"])
+sales["datesold"] = pd.to_datetime(sales["datesold"], format="mixed")
 
 # ---------------------------------------------------------------- Filters
 st.header("Filters")

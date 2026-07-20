@@ -17,10 +17,10 @@ st.caption("A fixed set of charts summarizing the full portfolio — not affecte
 listings = db.run_query(
     "SELECT listingid, city, propertytype, price, sqft, datelisted, latitude, longitude FROM listings"
 )
-listings["datelisted"] = pd.to_datetime(listings["datelisted"])
+listings["datelisted"] = pd.to_datetime(listings["datelisted"], format="mixed")
 
 sales = db.run_query("SELECT listingid, saleprice, datesold, daysonmarket FROM sales")
-sales["datesold"] = pd.to_datetime(sales["datesold"])
+sales["datesold"] = pd.to_datetime(sales["datesold"], format="mixed")
 
 listings_with_sales = listings.merge(sales, on="listingid", how="inner")
 

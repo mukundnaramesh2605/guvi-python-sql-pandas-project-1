@@ -194,7 +194,7 @@ def add_listing():
             db.cursor.execute(
                 "INSERT INTO listings (listingid, city, propertytype, price, sqft, datelisted, "
                 "agentid, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (listingid, city, propertytype, price, sqft, str(datelisted), agentid, latitude, longitude),
+                (listingid, city, propertytype, price, sqft, datelisted.strftime("%Y-%m-%d %H:%M:%S"), agentid, latitude, longitude),
             )
             db.conn.commit()
             flash_success(f"Listing {listingid} added.")
@@ -233,7 +233,7 @@ def update_listing():
             db.cursor.execute(
                 "UPDATE listings SET city=?, propertytype=?, price=?, sqft=?, datelisted=?, "
                 "agentid=?, latitude=?, longitude=? WHERE listingid=?",
-                (city, propertytype, price, sqft, str(datelisted), agentid, latitude, longitude, selected_id),
+                (city, propertytype, price, sqft, datelisted.strftime("%Y-%m-%d %H:%M:%S"), agentid, latitude, longitude, selected_id),
             )
             db.conn.commit()
             flash_success(f"Listing {selected_id} updated.")
@@ -283,7 +283,7 @@ def add_sale():
         try:
             db.cursor.execute(
                 "INSERT INTO sales (listingid, saleprice, datesold, daysonmarket) VALUES (?, ?, ?, ?)",
-                (listingid, saleprice, str(datesold), daysonmarket),
+                (listingid, saleprice, datesold.strftime("%Y-%m-%d %H:%M:%S"), daysonmarket),
             )
             db.conn.commit()
             flash_success(f"Sale for listing {listingid} added.")
@@ -314,7 +314,7 @@ def update_sale():
         try:
             db.cursor.execute(
                 "UPDATE sales SET saleprice=?, datesold=?, daysonmarket=? WHERE listingid=?",
-                (saleprice, str(datesold), daysonmarket, selected_id),
+                (saleprice, datesold.strftime("%Y-%m-%d %H:%M:%S"), daysonmarket, selected_id),
             )
             db.conn.commit()
             flash_success(f"Sale for listing {selected_id} updated.")
