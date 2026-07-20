@@ -316,77 +316,77 @@ SQL_QUERIES = {
             "title": "24.What is the average commission earned by each agent?",
             "sql": """
                 SELECT a.agentid, a.name, ROUND(AVG(s.saleprice * (a.commissionrate / 100)), 2) AS avg_commission_per_sale
-                FROM listings l
-                JOIN sales s ON s.listingid = l.listingid
-                JOIN agents a ON a.agentid = l.agentid
-                GROUP BY a.agentid, a.name
-                ORDER BY avg_commission_per_sale DESC;
+                    FROM listings l
+                    JOIN sales s ON s.listingid = l.listingid
+                    JOIN agents a ON a.agentid = l.agentid
+                    GROUP BY a.agentid, a.name
+                    ORDER BY avg_commission_per_sale DESC;
             """,
         },
         {
-            "title": "Which agents currently have the most active listings?",
+            "title": "25.Which agents currently have the most active listings?",
             "sql": """
                 SELECT a.agentid, a.name, COUNT(l.listingid) AS active_listings
-                FROM agents a
-                JOIN listings l ON l.agentid = a.agentid
-                LEFT JOIN sales s ON s.listingid = l.listingid
-                WHERE s.listingid IS NULL
-                GROUP BY a.agentid, a.name
-                ORDER BY active_listings DESC
-                LIMIT 10;
+                    FROM listings l
+                    JOIN agents a ON a.agentid = l.agentid
+                    WHERE NOT EXISTS (SELECT 1 FROM sales s WHERE l.listingid = s.listingid)
+                    GROUP BY a.agentid, a.name
+                    ORDER BY active_listings DESC;
             """,
         },
     ],
     "Buyer & Financing Behavior": [
         {
-            "title": "What percentage of buyers are investors vs end users?",
+            "title": "26.What percentage of buyers are investors vs end users?",
             "sql": """
                 SELECT buyertype,
-                       COUNT(*) AS buyers,
-                       ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM buyers), 2) AS pct_of_buyers
+                    COUNT(*) AS num_buyers,
+                    ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM buyers), 2) AS percentage
                 FROM buyers
                 GROUP BY buyertype;
             """,
         },
         {
-            "title": "Which cities have the highest loan uptake rate?",
+            "title": "27.Which cities have the highest loan uptake rate?",
             "sql": """
-                SELECT l.city,
-                       ROUND(100.0 * SUM(CASE WHEN b.loantaken = 1 THEN 1 ELSE 0 END) / COUNT(*), 2)
-                           AS loan_uptake_pct
+                SELECT l.city, SUM(b.loantaken) AS no_of_loans_taken, ROUND(100.0 * SUM(b.loantaken) / COUNT(*), 2) AS loan_uptake_rate
+                    FROM buyers b
+                    JOIN listings l ON l.listingid = b.saleid
+                    GROUP BY l.city
+                    ORDER BY loan_uptake_rate DESC;
+            """,
+        },
+        {
+            "title": "28.What is the average loan amount by buyer type?",
+            "sql": """
+                SELECT buyertype, ROUND(AVG(loanamount), 2) AS averageloanamount
+                    FROM buyers
+                    WHERE loanamount > 0
+                    GROUP BY buyertype;
+            """,
+        },
+        {
+            "title": "29.Which payment mode is most commonly used?",
+            "sql": """
+                SELECT paymentmode, COUNT(*) AS num_buyers
+                    FROM buyers
+                    GROUP BY paymentmode
+                    ORDER BY num_buyers DESC;
+            """,
+        },
+        {
+            "title": "30.Do loan-backed purchases take longer to close?",
+            "sql": """
+                SELECT
+                    CASE
+                        WHEN b.loantaken = 1 THEN 'Loan Taken'
+                        ELSE 'No Loan'
+                    END AS loan_status,
+                    ROUND(AVG(s.daysonmarket), 2) AS average_days_on_market
                 FROM buyers b
-                JOIN sales s ON s.listingid = b.saleid
-                JOIN listings l ON l.listingid = s.listingid
-                GROUP BY l.city
-                ORDER BY loan_uptake_pct DESC;
-            """,
-        },
-        {
-            "title": "What is the average loan amount by buyer type?",
-            "sql": """
-                SELECT buyertype, ROUND(AVG(loanamount), 2) AS avg_loan_amount
-                FROM buyers
-                WHERE loantaken = 1
-                GROUP BY buyertype;
-            """,
-        },
-        {
-            "title": "Which payment mode is most commonly used?",
-            "sql": """
-                SELECT paymentmode, COUNT(*) AS buyers
-                FROM buyers
-                GROUP BY paymentmode
-                ORDER BY buyers DESC;
-            """,
-        },
-        {
-            "title": "Do loan-backed purchases take longer to close?",
-            "sql": """
-                SELECT CASE WHEN b.loantaken = 1 THEN 'Loan' ELSE 'No Loan' END AS financing,
-                       ROUND(AVG(s.daysonmarket), 1) AS avg_days_on_market
-                FROM buyers b
-                JOIN sales s ON s.listingid = b.saleid
-                GROUP BY financing;
+                JOIN sales s ON b.saleid = s.listingid
+                GROUP BY loan_status
+                ORDER BY average_days_on_market DESC;
             """,
         },
     ],
