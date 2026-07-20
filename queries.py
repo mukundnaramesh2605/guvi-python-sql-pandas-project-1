@@ -3,26 +3,25 @@
 SQL_QUERIES = {
     "Property & Pricing Analysis": [
         {
-            "title": "Average listing price by city",
+            "title": "1. What is the average listing price by city?",
             "sql": """
-                SELECT city, ROUND(AVG(price), 2) AS avg_price, COUNT(*) AS listings
+                SELECT city, ROUND(AVG(price), 2) AS average_listing_price
                 FROM listings
                 GROUP BY city
-                ORDER BY avg_price DESC;
+                ORDER BY average_listing_price DESC;
             """,
         },
         {
-            "title": "Average price per square foot by property type",
+            "title": "2. What is the average price per square foot by property type?",
             "sql": """
-                SELECT propertytype,
-                       ROUND(AVG(price * 1.0 / sqft), 2) AS avg_price_per_sqft
+                SELECT propertytype, ROUND(AVG(price / sqft), 2) AS avg_price_per_sqft
                 FROM listings
                 GROUP BY propertytype
                 ORDER BY avg_price_per_sqft DESC;
             """,
         },
         {
-            "title": "Furnishing status impact on price",
+            "title": "3. How does furnishing status impact property prices?",
             "sql": """
                 SELECT pa.furnishingstatus, ROUND(AVG(l.price), 2) AS avg_price, COUNT(*) AS listings
                 FROM listings l
