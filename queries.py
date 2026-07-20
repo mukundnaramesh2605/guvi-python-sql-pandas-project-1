@@ -223,7 +223,7 @@ SQL_QUERIES = {
             """,
         },
         {
-            "title": "18.Which properties are currently unsold?",
+            "title": "18.Which properties are currently unsold?  - Solution 1",
             "sql": """
                 SELECT *
                     FROM listings l
