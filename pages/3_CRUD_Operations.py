@@ -12,6 +12,17 @@ render_sidebar_footer()
 st.title("CRUD Operations")
 st.caption("Create, read, update, and delete records across every table in the schema.")
 
+if "_flash_message" in st.session_state:
+    st.success(st.session_state.pop("_flash_message"))
+
+
+def flash_success(message: str):
+    # st.rerun() interrupts the script immediately, so a st.success() call right
+    # before it never gets rendered. Stash the message and show it after rerun instead.
+    st.session_state["_flash_message"] = message
+    st.rerun()
+
+
 table = st.selectbox(
     "Choose a table", ["Agents", "Listings", "Sales", "Buyers", "Property Attributes"]
 )
@@ -78,8 +89,7 @@ def add_agent():
                  experienceyears, avgclosingdays),
             )
             db.conn.commit()
-            st.success(f"Agent {agentid} added.")
-            st.rerun()
+            flash_success(f"Agent {agentid} added.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add agent: {e}")
@@ -117,8 +127,7 @@ def update_agent():
                  experienceyears, avgclosingdays, selected_id),
             )
             db.conn.commit()
-            st.success(f"Agent {selected_id} updated.")
-            st.rerun()
+            flash_success(f"Agent {selected_id} updated.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update agent: {e}")
@@ -141,8 +150,7 @@ def delete_agent():
         try:
             db.cursor.execute("DELETE FROM agents WHERE agentid = ?", (selected_id,))
             db.conn.commit()
-            st.success(f"Agent {selected_id} deleted.")
-            st.rerun()
+            flash_success(f"Agent {selected_id} deleted.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not delete agent (still referenced by listings): {e}")
@@ -179,8 +187,7 @@ def add_listing():
                 (listingid, city, propertytype, price, sqft, str(datelisted), agentid, latitude, longitude),
             )
             db.conn.commit()
-            st.success(f"Listing {listingid} added.")
-            st.rerun()
+            flash_success(f"Listing {listingid} added.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add listing: {e}")
@@ -219,8 +226,7 @@ def update_listing():
                 (city, propertytype, price, sqft, str(datelisted), agentid, latitude, longitude, selected_id),
             )
             db.conn.commit()
-            st.success(f"Listing {selected_id} updated.")
-            st.rerun()
+            flash_success(f"Listing {selected_id} updated.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update listing: {e}")
@@ -243,8 +249,7 @@ def delete_listing():
         try:
             db.cursor.execute("DELETE FROM listings WHERE listingid = ?", (selected_id,))
             db.conn.commit()
-            st.success(f"Listing {selected_id} deleted.")
-            st.rerun()
+            flash_success(f"Listing {selected_id} deleted.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not delete listing (still referenced by sales/property attributes): {e}")
@@ -271,8 +276,7 @@ def add_sale():
                 (listingid, saleprice, str(datesold), daysonmarket),
             )
             db.conn.commit()
-            st.success(f"Sale for listing {listingid} added.")
-            st.rerun()
+            flash_success(f"Sale for listing {listingid} added.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add sale: {e}")
@@ -303,8 +307,7 @@ def update_sale():
                 (saleprice, str(datesold), daysonmarket, selected_id),
             )
             db.conn.commit()
-            st.success(f"Sale for listing {selected_id} updated.")
-            st.rerun()
+            flash_success(f"Sale for listing {selected_id} updated.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update sale: {e}")
@@ -327,8 +330,7 @@ def delete_sale():
         try:
             db.cursor.execute("DELETE FROM sales WHERE listingid = ?", (selected_id,))
             db.conn.commit()
-            st.success(f"Sale for listing {selected_id} deleted.")
-            st.rerun()
+            flash_success(f"Sale for listing {selected_id} deleted.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not delete sale (still referenced by buyers): {e}")
@@ -363,8 +365,7 @@ def add_buyer():
                  loanprovider or None, loanamount),
             )
             db.conn.commit()
-            st.success(f"Buyer {buyerid} added.")
-            st.rerun()
+            flash_success(f"Buyer {buyerid} added.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add buyer: {e}")
@@ -400,8 +401,7 @@ def update_buyer():
                  loanamount, int(selected_id)),
             )
             db.conn.commit()
-            st.success(f"Buyer {selected_id} updated.")
-            st.rerun()
+            flash_success(f"Buyer {selected_id} updated.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update buyer: {e}")
@@ -421,8 +421,7 @@ def delete_buyer():
         try:
             db.cursor.execute("DELETE FROM buyers WHERE buyerid = ?", (int(selected_id),))
             db.conn.commit()
-            st.success(f"Buyer {selected_id} deleted.")
-            st.rerun()
+            flash_success(f"Buyer {selected_id} deleted.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not delete buyer: {e}")
@@ -467,8 +466,7 @@ def add_property_attribute():
                  int(parkingavailable), int(powerbackup)),
             )
             db.conn.commit()
-            st.success(f"Property attribute {attributeid} added.")
-            st.rerun()
+            flash_success(f"Property attribute {attributeid} added.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not add property attribute: {e}")
@@ -512,8 +510,7 @@ def update_property_attribute():
                  int(powerbackup), int(selected_id)),
             )
             db.conn.commit()
-            st.success(f"Property attribute {selected_id} updated.")
-            st.rerun()
+            flash_success(f"Property attribute {selected_id} updated.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not update property attribute: {e}")
@@ -535,8 +532,7 @@ def delete_property_attribute():
         try:
             db.cursor.execute("DELETE FROM property_attributes WHERE attributeid = ?", (int(selected_id),))
             db.conn.commit()
-            st.success(f"Property attribute {selected_id} deleted.")
-            st.rerun()
+            flash_success(f"Property attribute {selected_id} deleted.")
         except Exception as e:
             db.conn.rollback()
             st.error(f"Could not delete property attribute: {e}")
