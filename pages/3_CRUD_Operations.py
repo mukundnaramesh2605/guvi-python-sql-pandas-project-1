@@ -9,7 +9,7 @@ st.set_page_config(page_title="⚒️CRUD Operations | BrickView", layout="wide"
 db = get_db()
 render_sidebar_footer()
 
-st.title("CRUD Operations")
+st.title("⚒️CRUD Operations")
 st.caption("Create, read, update, and delete records across every table in the schema.")
 
 if "_flash_message" in st.session_state:

@@ -11,7 +11,7 @@ st.set_page_config(page_title="📈Visualizations | BrickView", page_icon="📈"
 db = get_db()
 render_sidebar_footer()
 
-st.title("Visualizations")
+st.title("📈Visualizations")
 st.caption("A fixed set of charts summarizing the full portfolio — not affected by filters.")
 
 listings = db.run_query(
